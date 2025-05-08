@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentimental Calendar</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 1rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; width: 14.28%; vertical-align: top; padding: 5px; }
+    th { background: #f0f0f0; }
+    .event { font-size: 0.8em; margin-top: 3px; display: block; }
+    .highlight { background-color: gold; }
+    #yearTitle { text-align: center; font-size: 1.5em; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <div id="yearTitle"></div>
+  <div id="calendarContainer"></div>
+
+  <script>
+    // Compute custom year
+    const today = new Date();
+    const epoch = new Date(2024, 4, 8);
+    let customYear = (today >= new Date(today.getFullYear(), epoch.getMonth(), epoch.getDate()))
+      ? today.getFullYear() - epoch.getFullYear() + 1
+      : today.getFullYear() - epoch.getFullYear();
+    document.getElementById('yearTitle').textContent = `Year ${String(customYear).padStart(4, '0')}`;
+
+    // Event definitions
+    const events = {
+      '01-01': ['Heroes Day'],
+      '01-06': ['Dumb Day'],
+      '01-20': ['Smart Day'],
+      '02-16': ['Rebirth Day'],
+      '02-18': ['Basil Day'],
+      '02-27': ['Ib Day'],
+      '03-01': ['Mari Day'],
+      '04-01': ['Skeleton Day'],
+      '04-09': ['Bread Day'],
+      '04-23': ['Uwharries Day'],
+      '04-28': ['Clannad Day'],
+      '05-02': ['Goobie Day'],
+      '05-07': ['New Year’s Eve'],
+      '05-08': ['New Year’s Day'],
+      '05-15': ['End of the Editomyel Mourning Period'],
+      '05-23': ['Aubrey Day'],
+      '06-03': ['Girl Day'],
+      '06-11': ['Ocean Day'],
+      '06-23': ['Fallout Day'],
+      '07-04': ['Shit Day'],
+      '07-20': ['Sunny Day'],
+      '08-04': ['Reality Day'],
+      '08-25': ['Flood Day'],
+      '09-01': ['Friendship Day'],
+      '09-15': ['Underground Day'],
+      '09-24': ['Termina Day'],
+      '11-08': ['Vision Day'],
+      '11-11': ['Kel Day'],
+      '11-13': ['OG Day'],
+      '12-13': ['Siblings Appreciation Day'],
+      '12-16': ['Psychosis Day'],
+      '12-25': ['Omori Day'],
+      '12-26': ['Boxing Day'],
+      '12-27': ['Haunted Day']
+    };
+
+    // Function to build a calendar table for given month/year
+    function buildCalendar(year, month) {
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      let html = '<table><tr>';
+      ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d => html += `<th>${d}</th>`);
+      html += '</tr><tr>';
+      // empty cells before first day
+      for (let i = 0; i < firstDay.getDay(); i++) html += '<td></td>';
+      for (let date = 1; date <= lastDay.getDate(); date++) {
+        const current = new Date(year, month, date);
+        let classes = '';
+        // highlight Holy Editom (Apr 9 - Jun 16)
+        const start = new Date(year, 3, 9);
+        const end = new Date(year, 5, 16);
+        if (current >= start && current <= end) classes = 'highlight';
+        html += `<td class="${classes}"><strong>${date}</strong>`;
+        const key = `${String(month+1).padStart(2,'0')}-${String(date).padStart(2,'0')}`;
+        if (events[key]) events[key].forEach(e => html += `<span class="event">${e}</span>`);
+        html += '</td>';
+        if (current.getDay() === 6 && date !== lastDay.getDate()) html += '</tr><tr>';
+      }
+      // empty cells after last day
+      for (let i = lastDay.getDay()+1; i <= 6; i++) html += '<td></td>';
+      html += '</tr></table>';
+      return html;
+    }
+
+    // Render current month calendar
+    const container = document.getElementById('calendarContainer');
+    container.innerHTML = buildCalendar(today.getFullYear(), today.getMonth());
+  </script>
+</body>
+</html>
